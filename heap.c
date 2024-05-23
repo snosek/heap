@@ -38,14 +38,28 @@ void print_heap(Heap *heap) {
     printf("\n");
 }
 
-int main(void) {
+Heap *init_heap(int *init_list, size_t len) {
     Heap *heap = malloc(sizeof(Heap));
-    heap->tree = malloc(7 * sizeof(int));
-    heap->size = 7;
-    int arr[7] = {7,6,5,4,3,2,1};
-    heap->tree = arr;
-    print_heap(heap);
+    if (heap == NULL) {
+        return NULL;
+    }
+    if ((heap->tree = malloc(len * sizeof(*heap->tree))) == NULL) {
+        free(heap);
+        return NULL;
+    }
 
+    heap->size = len;
+    for (int i = 0; i < len; i++) {
+        heap->tree[i] = init_list[i];
+    }
+    return heap;
+}
+
+int main(void) {
+    int a[] = {1,1,2,3,5,8};
+    Heap *heap = init_heap(a, 6);
+    print_heap(heap);
+    swim(heap, 3);
     print_heap(heap);
     return 0;
 }
