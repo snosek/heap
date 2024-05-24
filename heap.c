@@ -5,6 +5,10 @@
 #define left(idx) (2*idx + 1)
 #define right(idx) (2*idx + 2)
 
+#define RED "\x1b[31m"
+#define COLOR_RESET "\x1b[0m"
+#define printerr(msg) (printf(RED msg COLOR_RESET "\n"))
+
 typedef struct {
     int len;
     int *tree;
@@ -18,6 +22,7 @@ void swap(int *a, int *b) {
 
 int swim(Heap *heap, int idx) {
     if (idx < 0 || idx >= heap->len) {
+        printerr("Swim error: invalid index.");
         return -1;
     }
     while (heap->tree[parent(idx)] < heap->tree[idx]) {
@@ -30,13 +35,14 @@ int swim(Heap *heap, int idx) {
 //  |    |
 //  |    |
 //  |    |
-// \      /      napraw
+// \      /      lemon błagam napraw mnie
 //  \    /
 //   \  /
 //    \/
 int sink(Heap *heap, int idx) {
     if (idx < 0 || idx >= heap->len) {
-        return -1;
+        printerr("Sink error: invalid index.");
+        exit(-1);
     }
     while (heap->tree[parent(idx)] < heap->tree[idx]) {
         int parent = parent(idx);
@@ -75,9 +81,7 @@ int main(void) {
     Heap *heap = init_heap(a, 7);
 
     print_heap(heap);
-    if (swim(heap, 6) == -1) {
-        return -1;
-    }
+    swim(heap, 7);
     print_heap(heap);
 
     return 0;
