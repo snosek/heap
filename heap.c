@@ -5,10 +5,6 @@
 #define left(idx) (2*idx + 1)
 #define right(idx) (2*idx + 2)
 
-#define RED "\x1b[31m"
-#define COLOR_RESET "\x1b[0m"
-#define printerr(msg) (printf(RED msg COLOR_RESET "\n"))
-
 typedef struct {
     int len;
     int *tree;
@@ -63,7 +59,6 @@ Heap *init_heap(int *init_list, size_t len) {
     heapify(heap);
     return heap;
 }
-
 
 void heap_sort(int *arr, size_t len) {
     Heap *heap = init_heap(arr, len);
