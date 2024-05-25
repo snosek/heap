@@ -14,51 +14,6 @@ typedef struct {
     int *tree;
 } Heap;
 
-void swap(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-int swim(Heap *heap, int idx) {
-    if (idx < 0 || idx >= heap->len) {
-        printerr("Swim error: invalid index.");
-        return -1;
-    }
-    while (heap->tree[parent(idx)] < heap->tree[idx]) {
-        swap(&heap->tree[parent(idx)], &heap->tree[idx]);
-        idx = parent(idx);
-    }
-    return 0;
-}
-
-//  |    |
-//  |    |
-//  |    |
-// \      /      lemon błagam napraw mnie
-//  \    /
-//   \  /
-//    \/
-int sink(Heap *heap, int idx) {
-    if (idx < 0 || idx >= heap->len) {
-        printerr("Sink error: invalid index.");
-        exit(-1);
-    }
-    while (heap->tree[parent(idx)] < heap->tree[idx]) {
-        int parent = parent(idx);
-        swap(&heap->tree[parent(idx)], &heap->tree[idx]);
-        idx = parent(idx);
-    }
-    return 0;
-}
-
-void print_heap(Heap *heap) {
-    for (int i = 0; i < heap->len; i++) {
-        printf("%i ", (heap->tree[i]));
-    }
-    printf("\n");
-}
-
 Heap *init_heap(int *init_list, size_t len) {
     Heap *heap;
     if ((heap = malloc(sizeof(Heap))) == NULL) {
@@ -76,13 +31,87 @@ Heap *init_heap(int *init_list, size_t len) {
     return heap;
 }
 
-int main(void) {
-    int a[] = { 4, 3, 2, 1, 1, 4, 5 };
-    Heap *heap = init_heap(a, 7);
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
-    print_heap(heap);
-    swim(heap, 7);
-    print_heap(heap);
+int swim(Heap *heap, int idx) {
+    if (idx < 0 || idx >= heap->len) {
+        printerr("Swim error: invalid index.");
+        return -1;
+    }
+    while (idx > 0 && heap->tree[parent(idx)] < heap->tree[idx]) {
+        swap(&heap->tree[parent(idx)], &heap->tree[idx]);
+        idx = parent(idx);
+    }
+    return 0;
+}
+
+int sink(Heap *heap, int idx) {
+    if (idx < 0 || idx >= heap->len) {
+        printerr("Sink error: invalid index.");
+        return -1;
+    }
+
+    while (left(idx) < heap->len) {
+        int larger_child = left(idx);
+        if (right(idx) < heap->len && heap->tree[right(idx)] > heap->tree[left(idx)]) {
+            larger_child = right(idx);
+        }
+        if (heap->tree[idx] >= heap->tree[larger_child]) {
+            break;
+        }
+        swap(&heap->tree[idx], &heap->tree[larger_child]);
+        idx = larger_child;
+    }
+    return 0;
+}
+
+int heapify (Heap *heap) {
+    for (int i = heap->len/2; i >= 0; i--) {
+        sink(heap, i);
+    }
+    return 0;
+}
+
+int heap_sort(int *arr, size_t len) {
+    Heap *heap = init_heap(arr, len);
+    heapify(heap);
+
+    for (int i = len - 1; i > 0; i--) {
+        swap(&heap->tree[0], &heap->tree[i]);
+        heap->len--;
+        sink(heap, 0);
+    }
+
+    for (int i = 0; i < len; i++) {
+        arr[i] = heap->tree[i];
+    }
+
+    free(heap->tree);
+    free(heap);
+    return 0;
+}
+
+void print_arr(int arr[], int len) {
+    for (int i = 0; i < len; i++) {
+        printf("%i ", (arr[i]));
+    }
+    printf("\n");
+}
+
+int main(void) {
+    int arr[] = { 2, 8, 5, 55, 89, 233, 610, 34, 377, 144, 1, 21, 3, 1, 13 };
+    int len = sizeof(arr)/sizeof(arr[0]);
+
+    printf("Unsorted array: ");
+    print_arr(arr, len);
+
+    printf("Sorted array: ");
+    heap_sort(arr, len);
+    print_arr(arr, len);
 
     return 0;
 }
