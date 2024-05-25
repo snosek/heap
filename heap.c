@@ -23,7 +23,6 @@ Heap *init_heap(int *init_list, size_t len) {
         free(heap);
         return NULL;
     }
-
     heap->len = len;
     for (int i = 0; i < len; i++) {
         heap->tree[i] = init_list[i];
@@ -37,24 +36,14 @@ void swap(int *a, int *b) {
     *b = temp;
 }
 
-int swim(Heap *heap, int idx) {
-    if (idx < 0 || idx >= heap->len) {
-        printerr("Swim error: invalid index.");
-        return -1;
-    }
+void swim(Heap *heap, int idx) {
     while (idx > 0 && heap->tree[parent(idx)] < heap->tree[idx]) {
         swap(&heap->tree[parent(idx)], &heap->tree[idx]);
         idx = parent(idx);
     }
-    return 0;
 }
 
-int sink(Heap *heap, int idx) {
-    if (idx < 0 || idx >= heap->len) {
-        printerr("Sink error: invalid index.");
-        return -1;
-    }
-
+void sink(Heap *heap, int idx) {
     while (left(idx) < heap->len) {
         int larger_child = left(idx);
         if (right(idx) < heap->len && heap->tree[right(idx)] > heap->tree[left(idx)]) {
@@ -66,33 +55,25 @@ int sink(Heap *heap, int idx) {
         swap(&heap->tree[idx], &heap->tree[larger_child]);
         idx = larger_child;
     }
-    return 0;
 }
 
-int heapify (Heap *heap) {
+void heapify (Heap *heap) {
     for (int i = heap->len/2; i >= 0; i--) {
         sink(heap, i);
     }
-    return 0;
 }
 
-int heap_sort(int *arr, size_t len) {
+void heap_sort(int *arr, size_t len) {
     Heap *heap = init_heap(arr, len);
     heapify(heap);
-
-    for (int i = len - 1; i > 0; i--) {
+    for (int i = len - 1; i >= 0; i--) {
+        arr[i] = heap->tree[0];
         swap(&heap->tree[0], &heap->tree[i]);
         heap->len--;
         sink(heap, 0);
     }
-
-    for (int i = 0; i < len; i++) {
-        arr[i] = heap->tree[i];
-    }
-
     free(heap->tree);
     free(heap);
-    return 0;
 }
 
 void print_arr(int arr[], int len) {
@@ -108,7 +89,6 @@ int main(void) {
 
     printf("Unsorted array: ");
     print_arr(arr, len);
-
     printf("Sorted array: ");
     heap_sort(arr, len);
     print_arr(arr, len);
