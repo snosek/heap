@@ -14,22 +14,6 @@ typedef struct {
     int *tree;
 } Heap;
 
-Heap *init_heap(int *init_list, size_t len) {
-    Heap *heap;
-    if ((heap = malloc(sizeof(Heap))) == NULL) {
-        return NULL;
-    }
-    if ((heap->tree = malloc(len * sizeof(*heap->tree))) == NULL) {
-        free(heap);
-        return NULL;
-    }
-    heap->len = len;
-    for (int i = 0; i < len; i++) {
-        heap->tree[i] = init_list[i];
-    }
-    return heap;
-}
-
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
@@ -63,12 +47,29 @@ void heapify (Heap *heap) {
     }
 }
 
+Heap *init_heap(int *init_list, size_t len) {
+    Heap *heap;
+    if ((heap = malloc(sizeof(Heap))) == NULL) {
+        return NULL;
+    }
+    if ((heap->tree = malloc(len * sizeof(*heap->tree))) == NULL) {
+        free(heap);
+        return NULL;
+    }
+    heap->len = len;
+    for (int i = 0; i < len; i++) {
+        heap->tree[i] = init_list[i];
+    }
+    heapify(heap);
+    return heap;
+}
+
+
 void heap_sort(int *arr, size_t len) {
     Heap *heap = init_heap(arr, len);
-    heapify(heap);
     for (int i = len - 1; i >= 0; i--) {
         arr[i] = heap->tree[0];
-        swap(&heap->tree[0], &heap->tree[i]);
+        heap->tree[0] = heap->tree[i];
         heap->len--;
         sink(heap, 0);
     }
